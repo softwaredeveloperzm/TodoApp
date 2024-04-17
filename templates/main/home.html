@@ -1,0 +1,244 @@
+{% extends 'main/base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+<section id="intro" class="">
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-lg-8">
+
+                <div class="text-center">
+                <h2 class="display-5 lead">Todo <span class="text-danger">App</span>
+                    <a href="/" class="btn btn-danger float-end my-3">Logout</a>
+                </h2>
+            </div>
+
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="card mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+
+            <!-- Content input -->
+            <div class="form-group mb-0 me-3 flex-grow-1"> <!-- Set width to expand -->
+                <input type="text" name="text" class="form-control" id="text" placeholder="Create A List" required>
+            </div>
+
+            <!-- Date input with calendar icon -->
+            <div class="input-group date" style="width: 250px;">
+                <input type="text" name="date" class="form-control datepicker" placeholder="Select Date" required>
+                <span class="input-group-append">
+                    <span class="input-group-text bg-white">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                </span>
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-danger ms-3">
+                <i class="bi bi-plus"></i>
+            </button>
+
+        </div>
+    </div>
+</form>
+
+
+<script>
+    $(document).ready(function(){
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true
+        });
+    });
+</script>
+
+
+
+
+                {% if messages %}
+                <div class="alert alert-dismissible fade show" role="alert">
+                    <ul class="messages list-unstyled">
+                        {% for message in messages %}
+                        <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endif %}
+
+
+
+                <form class="my-5" action="" method="POST">
+                    {% csrf_token %}
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Task List</h5>
+                            <div class="table-responsive overflow-auto" style="max-height: 400px;">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Task</th>
+                                            <th scope="col">Actions</th>
+                                            <th scope="col">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if tasks %}
+                                            {% for task in tasks %}
+                                                <tr>
+                                                    <th scope="row">{{ forloop.counter }}</th>
+                                                    <td>{{ task.due_date }}</td>
+                                                    <td>{{ task.contents }}</td>
+                                                    <td>
+                                                        <a href="#" class="btn btn-outline" data-bs-toggle="modal" data-bs-target="#updateModal" data-task-id="{{ task.id }}">
+                                                            <i class="bi bi-pencil" style="font-size: 20px; color: red;"></i>
+                                                        </a>
+                                                        <a href="{% url 'delete_task' task.id %}" type="button" class="btn btn-outline">
+                                                            <i class="bi bi-trash3-fill text-danger" style="font-size: 20px;"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        {% if task.completed %}
+                                                            <a >
+                                                                <i class="bi bi-check-circle-fill text-success" style="font-size: 20px;"></i>
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{% url 'complete_task' task.id %}">
+                                                                <i class="bi bi-square text-secondary" style="font-size: 20px;"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="5" class="text-danger text-center display-6">No tasks yet</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        <div class="col-lg-4" style="margin-top: 100px;">
+            <!-- Completed Tasks Card -->
+            <div class="card mb-4">
+                <div class="card-header" style="background-color: #dc3545;">
+                    <h5 class="card-title text-white">Completed Tasks</h5>
+                </div>
+                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+            <ul class="list-group">
+
+                {% for task in completed_task %}
+                <li class="list-group-item">
+                    <!-- Display completed task content with truncated words -->
+                    {{ task.contents|truncatewords:10 }}
+
+                    <!-- Display completion date for completed tasks -->
+                    {% if task.due_date %}
+                    <span class="badge bg-success">
+                        Completed: {{ task.due_date|date:"Y-m-d" }}
+                    </span>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+    
+    <!-- Upcoming Tasks Card -->
+    <div class="card">
+        <div class="card-header" style="background-color: #dc3545;">
+            <h5 class="card-title text-white">Upcoming Tasks</h5>
+        </div>
+        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+    <ul class="list-group">
+                {% for task in upcoming_task %}
+        <li class="list-group-item">
+            <!-- Display incomplete task content with truncated words -->
+            {{ task.contents|truncatewords:10 }}
+
+            <!-- Display due date for incomplete tasks -->
+            {% if task.due_date %}
+            <span class="badge bg-secondary">
+                Due: {{ task.due_date|date:"Y-m-d" }}
+            </span>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+    </div>
+</div>
+
+
+        </div>
+    </div>
+
+
+
+
+
+    <!-- Update Task Modal -->
+<!-- Update Task Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Update Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form to update task -->
+                <form method="POST" action="" id="updateTaskForm">
+                    {% csrf_token %}
+                    <!-- Input fields for updating task details -->
+                    <div class="mb-3">
+                        {% for task in tasks %}
+                        <label for="taskName" class="form-label">Task Name</label>
+                        <input type="text" class="form-control" id="taskName" name="text" value="{{task.contents}}">
+                        {% endfor %}
+                    </div>
+                    <!-- Add more input fields for other task details -->
+                    <button type="submit" class="btn btn-primary">Update Task</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var updateModal = document.getElementById('updateModal');
+        updateModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget; // Button that triggered the modal
+            var taskId = button.getAttribute('data-task-id'); // Extract task ID from data-task-id attribute
+            var form = document.getElementById('updateTaskForm');
+            // Set the form action dynamically using the task ID
+            form.action = "{% url 'update_task' task_id=0 %}".replace('0', taskId);
+        });
+    });
+
+
+      $(function() {
+            $('#datepicker').datepicker();
+        });
+
+</script>
+
+
+
+</section>
+
+{% endblock %}

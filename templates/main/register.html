@@ -1,0 +1,79 @@
+{% extends 'main/base.html' %}
+{% block content %}
+
+<section id="login">
+	<div class="container-lg">
+
+		<div class="text-center my-3">
+			<p class="display-5 text-center">Register</p>
+		</div>
+
+		<div class="row justify-content-center">
+			<div class="col-lg-6">
+				<card>
+					<div class="card-body">
+						<form id="registration-form" action="" method="POST">
+							{% csrf_token %}
+							<div class="mb-3">
+								<label for="email" class="form-label">Email address:</label>
+								<input type="email" class="form-control" name="email" placeholder="eg example@gmail.com" required>
+							</div>
+
+							{% if messages %}
+							<div class="alert alert-dismissible fade show" role="alert">
+								<ul class="messages list-unstyled">
+									{% for message in messages %}
+									<li class="alert alert-{{ message.tags }}">{{ message }}</li>
+									{% endfor %}
+								</ul>
+								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
+							{% endif %}
+
+								<label for="Password" class="form-label"> Password</label>
+								<input type="Password" class="form-control" name="password" required>
+
+								<label for="Password" class="form-label"> Password Confrim</label>
+								<input type="Password" class="form-control" name="password_confrim" required>
+
+
+								<div class="gap-2 my-3">
+										<p> 
+											Already Have An Account? 
+											<a href="/" class="text-decoration-none">Login</a>
+										</p>
+
+								</div>
+
+								<div class=" gap-2 my-3">
+									<button id="register-btn" class="btn btn-danger" type="submit">
+										<span class="spinner-border spinner-border-sm d-none" id="spinner" role="status" aria-hidden="true"></span>
+										Register
+									</button>
+								</div>
+
+						</form>
+					</div>
+					</card>
+
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var form = document.getElementById("registration-form");
+    var button = document.getElementById("register-btn");
+    var spinner = document.getElementById("spinner");
+
+    form.addEventListener("submit", function() {
+        // Show spinner
+        spinner.classList.remove("d-none");
+        // Disable button to prevent multiple form submissions
+        button.disabled = true;
+    });
+});
+</script>
+
+{% endblock %}
